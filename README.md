@@ -13,7 +13,7 @@ Deepspeed、Bloom
 #### Para
     length<500,batchsize=32
    
-#### Requriments
+#### Requriements
     pytorch=1.13.1  deepspeed=0.7.5  tansformers=4.21.0
 
 #### Projects
