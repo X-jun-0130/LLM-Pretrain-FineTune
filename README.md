@@ -5,7 +5,7 @@ Deepspeed、Bloom
     Bloom_7B1
  
 #### Deepspeed
-    zero_3、cpuoffload
+    zero_3、cpuoffload、fp16
  
 #### Gpus
     4*48G A6000
