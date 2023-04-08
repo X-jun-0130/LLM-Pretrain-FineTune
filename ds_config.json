@@ -1,5 +1,5 @@
 {
-  "train_batch_size": 32,
+  "train_batch_size": 128,
 
     "optimizer": {
       "type": "Adam",
@@ -39,7 +39,7 @@
     "params": {
       "warmup_min_lr": 0,
       "warmup_max_lr": 5e-05,
-      "warmup_num_steps": 1000
+      "warmup_num_steps": 200
     }
   }
 }
