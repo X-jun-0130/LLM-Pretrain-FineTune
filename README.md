@@ -24,3 +24,4 @@ Deepspeed、Bloom
   
 #### gradient_checkpointing
     use_cache=False;  batch_size 可以增大10倍以上
+    token =1024,batchsize=32*4
