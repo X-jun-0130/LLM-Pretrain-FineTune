@@ -20,3 +20,7 @@ Deepspeed、Bloom
     1.FineTune: deepspeed --master_addr 0.0.0.0 --master_port 6006 --include localhost:0,1,2,3 ./Model_Bloom.py
     2.convert_deepspeedmodel_fp32: python model_convert32_save.py
     3.inference:python test.py
+    
+  
+#### gradient_checkpointing
+    use_cache=False;  batch_size 可以增大10倍以上
