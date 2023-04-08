@@ -33,7 +33,7 @@ training_args = TrainingArguments(output_dir='./results',
                                  weight_decay=0.01,
                                  fp16=True,
                                  gradient_checkpointing=True,
-                                 deepspeed='./config_file/ds_config_sft.json')
+                                 deepspeed='./ds_config.json')
 model = AutoModelForCausalLM.from_pretrained(model_name, use_cache =False).cuda()
 # model.resize_token_embeddings(len(tokenizer))
 
