@@ -1,39 +1,33 @@
-# deepspeed --master_addr 0.0.0.0 --master_port 6006 --include localhost:0,1,2,3 ./Model_Bloom.py
+# deepspeed --master_addr 172.16.0.126 --master_port 5050 --include localhost:0,1,2,3,4,5,6,7  ./Model_Bloom.py
+import os
+os.chdir('/Nlp_2023/Dialogue_Bloom/')
+
 import torch
-import time
 import json
 import numpy as np
-from torch.utils.data import Dataset, random_split
-import pandas as pd
-# from transformers import BloomModel
-from transformers import AutoTokenizer, TrainingArguments, Trainer, AutoModelForCausalLM, IntervalStrategy
+from torch.utils.data import Dataset,random_split
+from transformers import AutoTokenizer, TrainingArguments, Trainer, AutoModelForCausalLM
+from data_chunk import chunk_1024
 
-
-
-model_name = "./Bloom_7B1/"
-
-
+model_name = "/Bloom_6B4_zh/"
 torch.manual_seed(42)
-
-
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 training_args = TrainingArguments(output_dir='./results', 
                                  overwrite_output_dir=True,
                                  num_train_epochs=2, 
-                                 learning_rate=5e-5,
-                                 logging_steps=50, 
+                                 logging_steps=100, 
                                  save_strategy='steps',
-                                 save_steps = 450,
+                                 save_steps = 1300,
                                  evaluation_strategy = 'epoch',
                                  per_device_train_batch_size=32, 
                                  per_device_eval_batch_size=32, 
                                  lr_scheduler_type="cosine",
-                                 warmup_steps=200,
+                                 warmup_steps=100,
                                  weight_decay=0.01,
                                  fp16=True,
                                  gradient_checkpointing=True,
-                                 deepspeed='./ds_config.json')
+                                 deepspeed='./config_file/ds_config.json')
 model = AutoModelForCausalLM.from_pretrained(model_name, use_cache =False).cuda()
 # model.resize_token_embeddings(len(tokenizer))
 
@@ -53,33 +47,60 @@ class data_sets(Dataset):
         return self.input_ids[idx], self.attn_masks[idx]
 
 
+def sliding_window_template_with_examples(text, length, step):
+    left = 0
+    right = length
+    _list = []
+    while right < len(text) +step:
+        line = text[left:right]
+        _list.append(line)
+        left += step
+        right += step
+    
+    return _list
+
 '''
-data_process
+docx_book 51 1600w
+docx_zhinan[~800]
+drug_xls[~9700]
+disease_xls[~6700]
+
+bingli[:50000]
+
+qa[:50000]
+op[:50000]
+conversion[:50000]
+ner[:30000]
+classify[:20000]
+similarity[:10000]
+yin/yang [:5000]
+norli[]
 '''
-kg_list = json.load(open('./data_sft/medical_sft.json', 'r', encoding='utf-8')) + json.load(open('./data_sft/ner_sft.json', 'r', encoding='utf-8'))[:1000] + json.load(open('./data_sft/opqa_test.json', 'r', encoding='utf-8'))[:1000] + json.load(open('./data_sft/kuake_data.json', 'r', encoding='utf-8'))+json.load(open('./data_sft/qa_sft.json', 'r', encoding='utf-8'))
-# kg_dataset = [['<s>'+key['text'] +'</s>' + key['answer'] +'</s>', j] for j,key in enumerate(kg_list)]
-kg_dataset = ['<s>'+ 'User:'+key['text'] +'</s>' + 'System:'+key['answer'] +'</s>'  for key in kg_list]
+kg_list = json.load(open('./data/bookdoc.json', 'r', encoding='utf-8')) + json.load(open('./data/drug_disease_json.json', 'r', encoding='utf-8'))
+chunk_list,_ = chunk_1024([['data/bisai_dia.json',100000], ['data/dia_data.json',100000], ['data/kuake_data.json',100000], ['data/ner_data.json',100000], ['data/opqa_list1.json',100000], ['data/qa_data.json',20000]])
 
-#4000
-dia_list = json.load(open('./data_sft/dia_sft.json', 'r', encoding='utf-8')) 
-dia_2 = [['<s>'+  '</s>'.join(key) +'</s>', j] for j,key in enumerate(json.load(open('./data_sft/dia_data.json', 'r', encoding='utf-8')) )]
+doc_all = []
+for k in (kg_list+chunk_list):
+    if len(k) <= 1100:
+        doc_all.append(k)
+    else:
+        line_list = sliding_window_template_with_examples(k, 1100, 950)
+        doc_all.extend(line_list)
+        
 
-dia_dataset = ['<s>'+ key +'</s>' for key in  (dia_2 + dia_list)]
-print(dia_dataset[0])
-
+kg_dataset = ['<s>' + key +'</s>'  for key in doc_all]
 
 cut_dataset = []
-for line in (kg_dataset + dia_dataset):
+for line in kg_dataset:
     k = tokenizer.encode(line)
     if len(k) <= 1024:
         cut_dataset.append(line)
-print(cut_dataset[0:2])
 
+print(cut_dataset[100:102])
 dataset = data_sets(cut_dataset, 1024)
-train_size = int(0.98 * len(dataset))
+train_size = int(0.995 * len(dataset))
 train_dataset, val_dataset = random_split(dataset, [train_size, len(dataset) - train_size])
 print(len(cut_dataset), len(train_dataset))
-#11425
 
 '''
 model training
@@ -88,6 +109,7 @@ def the_collate_fn(batch):
     input_ids = torch.stack([f[0] for f in batch])
     attention_mask = torch.stack([f[1] for f in batch])
     return {'input_ids':input_ids, 'attention_mask':attention_mask, 'labels':input_ids}
+
 
 
 class Mytrainer(Trainer):
