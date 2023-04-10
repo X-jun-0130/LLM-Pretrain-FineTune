@@ -1,7 +1,7 @@
 import json
 import os
 import random
-os.chdir('/workspace/Xuxiangjun/Nlp_2023/Dialogue_Bloom/')
+os.chdir('/Nlp_2023/Dialogue_Bloom/')
 # from transformers import AutoTokenizer, TrainingArguments, Trainer, AutoModelForCausalLM
 
 # model_name = "./Bloom_3BSave/"
