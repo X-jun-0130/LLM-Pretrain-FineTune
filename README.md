@@ -36,4 +36,6 @@ Deepspeed、Bloom
 提取码：tw3q
 
 COT数据集 https://huggingface.co/datasets/QingyiSi/Alpaca-CoT
+
+医疗问答数据项目 Chinese-Medical-Question-Answering-System
 ```
