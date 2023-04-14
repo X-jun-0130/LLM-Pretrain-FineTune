@@ -25,3 +25,15 @@ Deepspeed、Bloom
 #### gradient_checkpointing
     use_cache=False;  batch_size 可以增大10倍以上
     token =1024,batchsize=32*4
+
+
+####  部分数据源整理
+```
+中文wiki https://dumps.wikimedia.org/zhwiki/latest/
+
+医疗指南 
+链接：https://pan.baidu.com/s/1p3chYKVE9s0Zlr2APJAwNQ 
+提取码：tw3q
+
+COT数据集 https://huggingface.co/datasets/QingyiSi/Alpaca-CoT
+```
