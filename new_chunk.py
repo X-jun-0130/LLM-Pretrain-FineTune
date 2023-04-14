@@ -33,6 +33,7 @@ def chunk_1024(file_list):
         _list += f[0][:f[1]]
     random.shuffle(_list)
     n += len(_list)
+    
 
     data_list.extend([k for k in _list if len(k) >= 1000])
     '''
