@@ -38,4 +38,6 @@ Deepspeed、Bloom
 COT数据集 https://huggingface.co/datasets/QingyiSi/Alpaca-CoT
 
 医疗问答数据项目 Chinese-Medical-Question-Answering-System
+
+医疗书籍类资源： 公众号【小航在奔跑】，免费下载的
 ```
