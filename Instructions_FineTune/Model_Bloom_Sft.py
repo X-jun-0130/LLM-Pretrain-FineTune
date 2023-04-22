@@ -16,7 +16,7 @@ torch.manual_seed(42)
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 training_args = TrainingArguments(output_dir='./results', 
-                                 num_train_epochs=7, 
+                                 num_train_epochs=4, 
                                  learning_rate=5e-6,
                                  logging_steps=10, 
                                  save_strategy='steps',
@@ -29,7 +29,7 @@ training_args = TrainingArguments(output_dir='./results',
                                  weight_decay=0.01,
                                  fp16=True,
                                  gradient_checkpointing=True,
-                                 deepspeed='./config_file/ds_config_sft.json')
+                                 deepspeed='./ds_config_sft.json')
 model = AutoModelForCausalLM.from_pretrained(model_name, use_cache =False).cuda()
 
 def tokenize(text):
@@ -136,13 +136,6 @@ def the_collate_fn(batch):
 #     labels = torch.stack([f[2] for f in batch])
 #     return {'input_ids':input_ids, 'attention_mask':attention_mask, 'labels':labels}
 
-# def evaluate_bleu(predictions, references)
-
-
-#     return {'bleu':score}
-
-# def compute_metrics(p):
-#     loss, logits = p
 
 
 class Mytrainer(Trainer):
