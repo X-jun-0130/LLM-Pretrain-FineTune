@@ -8,10 +8,11 @@ Deepspeed、Bloom
     zero_3、cpuoffload、fp16
  
 #### Gpus
-    4*48G A6000
+    8*48G A6000
 
 #### Para
-    length<500,batchsize=32
+    token=1024,batchsize=32*8
+    token=2048,batchsize=8*8
    
 #### Requriements
     pytorch=1.13.1  deepspeed=0.7.5  tansformers=4.21.0
@@ -24,7 +25,7 @@ Deepspeed、Bloom
   
 #### gradient_checkpointing
     use_cache=False;  batch_size 可以增大10倍以上
-    token =1024,batchsize=32*4
+    token =1024,batchsize=32*8
 
 
 ####  部分数据源整理
