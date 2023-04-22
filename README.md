@@ -1,4 +1,4 @@
-# LLM-FineTune
+# LLM-Pretrain-FineTune
 Deepspeed、Bloom
 
 #### Model
@@ -20,7 +20,8 @@ Deepspeed、Bloom
     transformers=4.28.1带有大模型的生成效果【流式输出】，最近进行了升级，同时deepspeed升级为0.8.3，torch没变
 
 #### Projects
-    1.FineTune: deepspeed --master_addr 0.0.0.0 --master_port 6006 --include localhost:0,1,2,3,4,5,6,7 ./Model_Bloom.py
+    0.Pretrain: deepspeed --master_addr 0.0.0.0 --master_port 6006 --include localhost:0,1,2,3,4,5,6,7 ./Model_Bloom_Pretrain.py
+    1.FineTune: deepspeed --master_addr 0.0.0.0 --master_port 6006 --include localhost:0,1,2,3,4,5,6,7 ./Model_Bloom_Sft.py
     2.convert_deepspeedmodel_fp32: python model_convert32_save.py
     3.inference:python test.py
     
@@ -29,6 +30,15 @@ Deepspeed、Bloom
     use_cache=False;  batch_size 可以增大10倍以上
     token =1024,batchsize=32*8
 
+#### 预训练数据处理
+     0.书籍这类数据章节内容都超长，使用了滑动窗口取数的方式，1024token的，书籍窗口设置1100，步长设置950，句子有150字符是重复，为了模型能够续写记住切断的句子
+     1.对于较短的文本，比如问答、选择题这类数据，采用拼接的方式；
+     2.预训练的数据没有做什么格式上的处理，比如问答数据：q+a直接组合，中间没有什么特殊符号、多轮问答：保留角色直接组合；
+     3.预训练的文本，形如:<s>text</s>形式进行模型
+     
+#### 微调数据处理
+     0.微调数据中单论问答和多轮问答，都规定了角色信息，输入端id: #User, 模型输出端id:#System;
+     1.所有文本进行拼接，长度不超过1024token，形如：#User:q1</s>#System:a1</s>#User:q2</s>#System:a2....;
 
 ####  部分数据源整理
 ```
