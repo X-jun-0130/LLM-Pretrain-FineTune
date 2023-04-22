@@ -23,7 +23,8 @@ Deepspeed、Bloom
     0.Pretrain: deepspeed --master_addr 0.0.0.0 --master_port 6006 --include localhost:0,1,2,3,4,5,6,7 ./Model_Bloom_Pretrain.py
     1.FineTune: deepspeed --master_addr 0.0.0.0 --master_port 6006 --include localhost:0,1,2,3,4,5,6,7 ./Model_Bloom_Sft.py
     2.convert_deepspeedmodel_fp32: python model_convert32_save.py
-    3.inference:python test.py
+    3.inference: python test.py
+    4.api: python Bloom_api.py
     
   
 #### gradient_checkpointing
