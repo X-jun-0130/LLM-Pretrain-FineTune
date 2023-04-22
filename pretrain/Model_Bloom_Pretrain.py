@@ -16,8 +16,8 @@ training_args = TrainingArguments(output_dir='./results',
                                  num_train_epochs=2.2, 
                                  logging_steps=100, 
                                  learning_rate=1e-5,
-                                 save_strategy='epoch',
-                                #  save_steps = 6200,
+                                 save_strategy='steps',
+                                 save_steps = 6200,
                                  evaluation_strategy = 'epoch',
                                  per_device_train_batch_size=32, 
                                  per_device_eval_batch_size=32, 
@@ -26,7 +26,7 @@ training_args = TrainingArguments(output_dir='./results',
                                  weight_decay=0.01,
                                  fp16=True,
                                  gradient_checkpointing=True,
-                                 deepspeed='./config_file/ds_config.json')
+                                 deepspeed='./ds_config.json')
 model = AutoModelForCausalLM.from_pretrained(model_name, use_cache =False).cuda()
 # model.resize_token_embeddings(len(tokenizer))
 
@@ -55,13 +55,6 @@ pretrain_data = diaqa_dataset + doc_data + kg_data
 print(len(pretrain_data))
 print(pretrain_data[100000:100002])
 
-# cut_dataset = []
-# for line in pretrain_data:
-#     k = tokenizer.encode(line)
-#     if len(k) <= 2048:
-#         cut_dataset.append(line)
-
-# print(len(cut_dataset))
 #362570
 dataset = data_sets(pretrain_data, 1024)
 train_size = int(0.9995 * len(dataset))
