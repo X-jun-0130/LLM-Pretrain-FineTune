@@ -48,10 +48,10 @@ host_id = '#System:'
 def infer(model, payload, history):
     payload = user_id + payload
     if len(history) > 0:
-        input_text = '<s>' + '</s>'.join([k[0]+ '</s>' +k[1] for k in history]) + '</s>' + payload + '</s>' + host_id
+        input_text =  '</s>'.join([k[0]+ '</s>' +k[1] for k in history]) + '</s>' + payload + '</s>' + host_id
 
     else:
-        input_text = '<s>'  + payload + '</s>' + host_id
+        input_text = payload + '</s>' + host_id
 
     
     his_length =  max(len(''.join([k[0]+k[1] for k in history])), len(payload))
