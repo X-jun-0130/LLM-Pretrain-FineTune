@@ -41,3 +41,10 @@ COT数据集 https://huggingface.co/datasets/QingyiSi/Alpaca-CoT
 
 医疗书籍类资源： 公众号【小航在奔跑】，免费下载的
 ```
+
+
+
+####  注意
+最近在使用6b4_zh_Bloom在进行医疗数据增量预训练，发现这个模型预训练的时候在使用和Bloom_7B1相同的lr=5e-5，第二个epoch时，过拟合现象特别严重。
+所以我现在用6b4_zh_Bloom时，使用lr=1e-5，感觉还可以更小一点。
+改天将预训练的一些东西整理进来
