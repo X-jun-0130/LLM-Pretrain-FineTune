@@ -39,6 +39,7 @@ Deepspeed、Bloom
 #### 微调数据处理
      0.微调数据中单论问答和多轮问答，都规定了角色信息，输入端id: #User, 模型输出端id:#System;
      1.所有文本进行拼接，长度不超过1024token，形如：#User:q1</s>#System:a1</s>#User:q2</s>#System:a2....;
+     2.微调时，有两种方式:一是整体微调，不对label做任何处理；一是将label中User输入的部分进行屏蔽，其label值设为-100(tokenize和注释掉的那部分)
 
 ####  部分数据源整理
 ```
@@ -55,6 +56,8 @@ COT数据集 https://huggingface.co/datasets/QingyiSi/Alpaca-CoT
 医疗书籍类资源： 公众号【小航在奔跑】，免费下载的
 
 MOSS开源了大量指令数据
+
+翻译后的中文Lora数据
 ```
 
 
