@@ -117,21 +117,12 @@ doc
 '''
 doc_list = json.load(open('./new_data/doc_data/bookdoc.json', 'r', encoding='utf-8')) + json.load(open('./new_data/doc_data/drug_disease_json.json', 'r', encoding='utf-8')) 
 
-erton =  [str(k).strip().replace('\n', '')[1:-1] for k in  json.load(open('./new_data/doc_data/erton_zd.json', 'r', encoding='utf-8'))]
-siyuan = [str(k).strip().replace('\n', '')[1:-1] for k in  json.load(open('./new_data/doc_data/siyuan_zd.json', 'r', encoding='utf-8'))]
-zs_zd = [str(k).strip().replace('\n', '')[1:-1] for k in  json.load(open('./new_data/doc_data/zs_zd.json', 'r', encoding='utf-8'))]
-bc_doc = json.load(open('./new_data/doc_data/bc_info.json', 'r', encoding='utf-8'))
-ruyuan = [str(k).strip().replace('\n', '') for k in  json.load(open('./new_data/doc_data/RYjilu_zd.json', 'r', encoding='utf-8'))]
-chuyuan = [str(k).strip().replace('\n', '') for k in  json.load(open('./new_data/doc_data/CYjilu_zd.json', 'r', encoding='utf-8'))]
-ssjl = json.load(open('./new_data/doc_data/ssjl_data.json', 'r', encoding='utf-8'))
+zd_1 =  [str(k).strip().replace('\n', '')[1:-1] for k in  json.load(open('./new_data/doc_data/zd_1.json', 'r', encoding='utf-8'))]
+zd_2 = [str(k).strip().replace('\n', '')[1:-1] for k in  json.load(open('./new_data/doc_data/zd_2.json', 'r', encoding='utf-8'))]
 
-# doc_medical,_ = chunk_2048([[bc_doc,100000],
-#                            [erton, 100000],
-#                            [siyuan, 100000],
-#                            [zs_zd, 100000],
-#                            [ruyuan, 100000],
-#                            [chuyuan,100000],
-#                            [ssjl, 100000]], 2250)                         
+
+# doc_medical,_ = chunk_2048([[zd_1,100000],
+#                            [zd_2, 100000]], 2250)                         
 
 # doc_2048 = []
 # for k in (doc_list + doc_medical):
@@ -242,8 +233,6 @@ print(cot_med_qa[-1])
 kuake_qa = [k['text']+ k['answer'] for k in  json.load(open('./new_data/qa_data/kuake_qa.json', 'r', encoding='utf-8'))]
 llama_qa = [k['text']+k['answer'] for k in  json.load(open('./new_data/qa_data/llama_qa.json', 'r', encoding='utf-8'))]
 print(kuake_qa[-1])
-bingli_qa = [k['instruction']+k['input']+k['output'] for k in  json.load(open('./new_data/doc_data/medical_bingli.json', 'r', encoding='utf-8'))]
-
 lora_qa = [k['instruction']+k['input']+k['output'] for k in  json.load(open('./new_data/qa_data/trans_chinese_alpaca_data.json', 'r', encoding='utf-8'))]
 print(lora_qa[-2])
 
@@ -260,7 +249,6 @@ print(lora_qa[-2])
 #                            [cot_other_qa,60000],
 #                            [kuake_qa,100000],
 #                            [llama_qa,100000],
-#                            [bingli_qa,100000],
 #                            [lora_qa, 100000]], 2800)
 
 
