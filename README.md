@@ -2,7 +2,7 @@
 Deepspeed、Bloom
 
 #### Model
-[Bloom_6b4_zh](https://huggingface.co/Langboat/bloom-6b4-zh) 本文所有模型，可替换成LLama
+[Bloom_6b4_zh](https://huggingface.co/Langboat/bloom-6b4-zh) 本文所用模型，可替换成LLama
 
     
 #### Deepspeed
