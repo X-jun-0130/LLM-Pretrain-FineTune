@@ -30,5 +30,5 @@ for k in sft[10000:15000]:
         print('-------------------')
         json_str = json.dumps({'instruction':k, 'input':'', 'output':res}, ensure_ascii=False)
         with open('./instruction/harmlessness.json', 'a+', encoding='utf-8') as qa_list:
-            qa_list.write(json_str + ',' + '\n')
+            qa_list.write(json_str +  '\n')
 
