@@ -3,6 +3,7 @@ Deepspeed、Bloom
 
 #### Model
     Bloom_7B1
+    [Bloom_6b4_zh](https://huggingface.co/Langboat/bloom-6b4-zh) 推荐使用
  
 #### Deepspeed
     zero_3、cpuoffload、fp16
