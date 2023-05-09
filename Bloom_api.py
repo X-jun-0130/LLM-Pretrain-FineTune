@@ -139,7 +139,7 @@ def generate_stream(model, tokenizer, inputs, device, context_len=1024):
     thread.start()
     for i, output in enumerate(streamer):
         if i > 1:
-            yield output.strip('</s>').replace('#System:', '')
+            yield output.strip('</s>').replace('Assistant:', '')
 
 
 def generate(model, tokenizer, inputs, device, context_len=1024):
@@ -193,7 +193,7 @@ class ModelWorker:
         inputs = [
             i['role'] + ':' + i['content'].strip('\n')  for i in inputs
         ]
-        return '</s>'.join(inputs) + '</s>#System:'
+        return '</s>\n '.join(inputs) + '</s>\n Assistant:'
 
     def get_queue_length(self):
         if (
