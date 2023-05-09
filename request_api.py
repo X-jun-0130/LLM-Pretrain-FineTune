@@ -13,7 +13,7 @@ def get_prompt_answer(text, ues_model=True):
     if ues_model:
         response, history = model.chat(tokenizer, text, history=[])
     else:
-        Post_url = "http://172.16.0.127:8001/ask/"
+        Post_url = "http://{}:8001/ask/"
         Post_data = json.dumps({"user_request": text, history:[]})
         r_json = requests.post(Post_url, Post_data)
         text = json.loads(r_json.text)
