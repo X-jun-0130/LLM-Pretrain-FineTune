@@ -85,6 +85,7 @@ Chatglm:很抱歉，我作为一个医疗人工智能助手，并没有能力帮
 ![对话](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/dialogue.png)
 
 3.医疗问答
+![医疗问答](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/medical_consult.png)
 
 4.无害性回复
 ![无害性回复](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/harmlessness.png)
