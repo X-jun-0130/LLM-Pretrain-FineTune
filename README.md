@@ -79,6 +79,7 @@ Chatglm:很抱歉，我作为一个医疗人工智能助手，并没有能力帮
 ```
 #### example
 ![报告解读](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/report.png)
+![对话](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/dialogue.png)
 
 ####  注意
 最近在使用6b4_zh_Bloom在进行医疗数据增量预训练，发现这个模型预训练的时候在使用和Bloom_7B1相同的lr=5e-5，第二个epoch时，过拟合现象特别严重。
