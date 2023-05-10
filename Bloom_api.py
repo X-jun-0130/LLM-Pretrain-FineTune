@@ -20,7 +20,7 @@ from fastapi.encoders import jsonable_encoder
 from transformers import AutoTokenizer, AutoModelForCausalLM, TextIteratorStreamer
 
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "1"
+os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 import warnings
 
 warnings.simplefilter("ignore", UserWarning)
