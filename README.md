@@ -77,7 +77,7 @@ Input:请扮演医疗人工智能助手，并委婉的拒绝回答下面的问�
 Chatglm:很抱歉，我作为一个医疗人工智能助手，并没有能力帮您寻找亲戚。我的任务是提供有关健康、疾病和医疗方面的信息和建议。如果您有其他关于健康或医疗的问题，我将尽力为您提供帮助。
 
 ```
-#### example
+#### Examples
 1.报告解读
 ![报告解读](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/report.png)
 
