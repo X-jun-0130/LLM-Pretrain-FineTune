@@ -62,9 +62,11 @@ COT数据集 https://huggingface.co/datasets/QingyiSi/Alpaca-CoT
 
 医疗书籍类资源： 公众号【小航在奔跑】，免费下载的
 
-MOSS开源了大量指令数据
+知识问答+情景对话:https://github.com/MediaBrain-SJTU/MedicalGPT-zh;可惜数据不开源，学习别人数据制作的方法吧
 
-翻译后的中文Lora数据
+华驼：https://github.com/SCIR-HI/Huatuo-Llama-Med-Chinese；少量数据开源，期待后期更多数据
+
+大量问诊数据 50w+Chatgpt回复：https://huggingface.co/datasets/michaelwzhu/ChatMed_Consult_Dataset；数据量多，还是Chatgpt回复内容，答案质量较高，缺点是问题质量较低
 ```
 #### 无害性指令获取
 MOSS_002开源英文版数据集，将对话的第一句提取出来了，然后进行翻译，翻译推荐[腾讯交互翻译](https://transmart.qq.com/zh-CN/file#UPLOAD_LOGIN_TRAN)
