@@ -2,6 +2,7 @@
 import os
 import re
 import copy
+
 import torch
 import json
 from torch.utils.data import Dataset, random_split
@@ -15,10 +16,10 @@ torch.manual_seed(42)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 training_args = TrainingArguments(output_dir='./results', 
                                  num_train_epochs=3, 
-                                 learning_rate=2e-6,
-                                 logging_steps=10, 
+                                 learning_rate=1e-6,
+                                 logging_steps=100, 
                                  save_strategy='steps',
-                                 save_steps = 337,
+                                 save_steps = 2500,
                                  evaluation_strategy = 'epoch',
                                  per_device_train_batch_size=32, 
                                  per_device_eval_batch_size=32, 
@@ -77,16 +78,16 @@ def tokenize(text):
 10.阴阳性 (200)
 '''
 class data_sets(Dataset):
-    def __init__(self, txt_list,  max_length):
+    def __init__(self, txt_list):
         self.input_ids = []
         self.attn_masks = []
         self.labels = []
         for i, txt in enumerate(txt_list):
             encodings_dict = tokenize(txt)
-            padding_len = max(0, max_length - len(encodings_dict['input_ids']))
-            self.input_ids.append(torch.tensor([3]*padding_len + encodings_dict['input_ids']))
-            self.attn_masks.append(torch.tensor([0]*padding_len +  encodings_dict['attention_mask']))
-            self.labels.append(torch.tensor([-100] * padding_len +  encodings_dict['labels']))
+            # padding_len = max(0, max_length - len(encodings_dict['input_ids']))
+            self.input_ids.append(encodings_dict['input_ids'])
+            self.attn_masks.append( encodings_dict['attention_mask'])
+            self.labels.append(encodings_dict['labels'])
             print(i)
     def __len__(self):
         return len(self.input_ids)
@@ -125,11 +126,11 @@ for line in instructions:
 
 print(len(instruction_list))
 
-dataset = data_sets(instruction_list, 1024)
-train_size = int(0.88 * len(dataset))
+dataset = data_sets(instruction_list)
+train_size = int(0.98 * len(dataset))
 train_dataset, val_dataset = random_split(dataset, [train_size, len(dataset) - train_size])
 print(len(instruction_list), len(train_dataset))
-#49371
+#59168
 
 '''
 model training
@@ -141,9 +142,10 @@ model training
 
 
 def the_collate_fn(batch):  
-    input_ids = torch.stack([f[0] for f in batch])
-    attention_mask = torch.stack([f[1] for f in batch])
-    labels = torch.stack([f[2] for f in batch])
+    maxlength = max([len(f[0]) for f in batch])
+    input_ids = torch.stack([torch.tensor([3]*(maxlength-len(f[0])) + f[0]) for f in batch])
+    attention_mask = torch.stack([torch.tensor([0]*(maxlength-len(f[1])) + f[1]) for f in batch])
+    labels = torch.stack([torch.tensor([-100]*(maxlength-len(f[2])) + f[2]) for f in batch])
     return {'input_ids':input_ids, 'attention_mask':attention_mask, 'labels':labels}
 
 
