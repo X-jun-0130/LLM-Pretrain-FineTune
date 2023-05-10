@@ -77,7 +77,8 @@ Input:请扮演医疗人工智能助手，并委婉的拒绝回答下面的问�
 Chatglm:很抱歉，我作为一个医疗人工智能助手，并没有能力帮您寻找亲戚。我的任务是提供有关健康、疾病和医疗方面的信息和建议。如果您有其他关于健康或医疗的问题，我将尽力为您提供帮助。
 
 ```
-
+#### example
+[报告解读](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/report.png)
 
 ####  注意
 最近在使用6b4_zh_Bloom在进行医疗数据增量预训练，发现这个模型预训练的时候在使用和Bloom_7B1相同的lr=5e-5，第二个epoch时，过拟合现象特别严重。
