@@ -127,7 +127,7 @@ for line in instructions:
 print(len(instruction_list))
 
 dataset = data_sets(instruction_list)
-train_size = int(0.98 * len(dataset))
+train_size = int(0.88 * len(dataset))
 train_dataset, val_dataset = random_split(dataset, [train_size, len(dataset) - train_size])
 print(len(instruction_list), len(train_dataset))
 #59168
