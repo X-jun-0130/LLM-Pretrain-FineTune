@@ -51,7 +51,7 @@ def tokenize(text):
 
             if start_idx is not None and end_idx is not None:
                 idx.extend([j for j in range(start_idx, int(end_idx))])
-
+    idx = list(set(idx))
     if len(idx) > 0:
         for k in range(len(labels)):
             if k not in idx:
