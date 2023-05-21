@@ -109,6 +109,9 @@ Chatglm:很抱歉，我作为一个医疗人工智能助手，并没有能力帮
 
 ## 医疗场景
 实际的医疗场景是很复杂的，业务场景也很多。目前开源的一些医疗类的GPT，绝大部分都满足不了实际的应用。
+- 生成单轮对话
+![生成多轮对话](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/genechat.png)
+
 - 指标抽取
 ```
 例子：
