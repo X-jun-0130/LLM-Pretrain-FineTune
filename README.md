@@ -30,8 +30,8 @@
     4.api: python Bloom_api.py  
 - gradient_checkpointing  
     use_cache=False;  batch_size 可以增大10倍以上  
-    token =1024,batchsize=32*8  
-    token=2048,batch=8*8  
+    token =1024,batchsize=32 * 8  
+    token=2048,batch=8 * 8  
 
 #### 预训练数据处理
      0.书籍这类数据章节内容都超长，使用了滑动窗口取数的方式，1024token的，书籍窗口设置1100，步长设置950，句子有150字符是重复，为了模型能够续写记住切断的句子
