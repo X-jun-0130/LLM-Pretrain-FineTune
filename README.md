@@ -17,8 +17,8 @@
 - GPUs  
     8*48G A6000
 - Para  
-    token=1024,batchsize=32*8  
-    token=2048,batchsize=8*8
+    token=1024,batchsize=32✖8  
+    token=2048,batchsize=8✖8
 - Requriements  
     pytorch=1.13.1  deepspeed=0.7.5  tansformers=4.21.0  
     transformers=4.28.1带有大模型的生成效果【流式输出】，最近进行了升级，同时deepspeed升级为0.8.3，torch没变
