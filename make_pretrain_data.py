@@ -64,9 +64,9 @@ def chunk_1024(file_list, length):
     时间太长了，将列表分100批进行组合
     '''
     list_1080 = [k for k in _list if len(k) < length]
-    length = len(list_1080)
-    slice = 100
-    m = int(length/slice)+1
+    list_length = len(list_1080)
+    slice = 300
+    m = int(list_length/slice)+1
     for i in range(slice):
         slice_list = list_1080[i*m:(i+1)*m]
         joint_1080 = joint(slice_list, length)
@@ -89,9 +89,9 @@ def chunk_2048(file_list, length):
     时间太长了，将列表分100批进行组合
     '''
     list_2100 = [k for k in _list if len(k) < length]
-    length = len(list_2100)
+    list_length = len(list_2100)
     slice = 300
-    m = int(length/slice)+1
+    m = int(list_length/slice)+1
     for i in range(slice):
         slice_list = list_2100[i*m:(i+1)*m]
         joint_2100 = joint(slice_list, length)
