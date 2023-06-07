@@ -174,3 +174,4 @@ output:
 2. 可以用prompt训练来生成output，以后可以构建自己训练数据的生成模型。
 3. 知识库构建中的一环。根据大模型结合本地知识构建应用是非常重要的功能。 大模型和知识库的应用是利用Embedding匹配文本，然后将问题和匹配到的文本输入到模型。
 我们用上面的这种数据，将prompt中的文本以及output中的问题进行结合，可以训练模型结合提供的文本和问题来生成答案。
+![知识库prompt](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/kb_instruction.png)
