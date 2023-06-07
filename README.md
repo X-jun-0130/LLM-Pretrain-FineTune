@@ -169,6 +169,6 @@ output:
 这种方式制作的数据可以应用的途径有以下几种：
 1. output内容用来构建知识问答数据
 2. 可以用prompt训练来生成output，以后可以构建自己训练数据的生成模型。
-3. 知识库构建中的一环。根据大模型结合本地知识构建应用是非常重要的功能。 大模型和知识库的应用是利用Embedding匹配文本，然后将问题和匹配到的文本输入到模型。
+3. [知识库](https://github.com/NLPxiaoxu/KB_LLM)构建中的一环。根据大模型结合本地知识构建应用是非常重要的功能。 大模型和知识库的应用是利用Embedding匹配文本，然后将问题和匹配到的文本输入到模型。
 我们用上面的这种数据，将prompt中的文本以及output中的问题进行结合，可以训练模型结合提供的文本和问题来生成答案。
 ![知识库prompt](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/kb_instruction.png)
