@@ -84,22 +84,19 @@ Chatglm:很抱歉，我作为一个医疗人工智能助手，并没有能力帮
 
 <details>
 <summary>对话</summary>
-<pre><code>
-![对话](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/dialogue.png)
+<img src="https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/dialogue.png"/> 
 </code></pre>
 </details>
 
 <details>
 <summary>医疗问答</summary>
-<pre><code>
-![医疗问答](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/medical_consult.png)
+<img src="https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/medical_consult.png"/> 
 </code></pre>
 </details>
 
 <details>
 <summary>无害性回复</summary>
-<pre><code>
-![无害性回复](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/harmlessness.png)
+<img src="https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/harmlessness.png"/> 
 </code></pre>
 </details>
 
