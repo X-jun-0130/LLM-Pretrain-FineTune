@@ -78,21 +78,32 @@ Chatglm:很抱歉，我作为一个医疗人工智能助手，并没有能力帮
 #### Examples
 
 <details>
-<summary>展开查看</summary>
+<summary>报告解读</summary>
 <pre><code>
-报告解读
 ![报告解读](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/report.png)
 </code></pre>
 </details>
 
-2.对话
+<details>
+<summary>对话</summary>
+<pre><code>
 ![对话](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/dialogue.png)
+</code></pre>
+</details>
 
-3.医疗问答
+<details>
+<summary>医疗问答</summary>
+<pre><code>
 ![医疗问答](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/medical_consult.png)
+</code></pre>
+</details>
 
-4.无害性回复
+<details>
+<summary>无害性回复</summary>
+<pre><code>
 ![无害性回复](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/harmlessness.png)
+</code></pre>
+</details>
 
 
 ## **医疗场景**
