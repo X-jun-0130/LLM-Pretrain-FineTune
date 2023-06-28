@@ -6,25 +6,31 @@
 
 
 <details>
-<summary>**Model_Project**</summary>
+<summary>Model_Project</summary>
 - [Bloom_6b4_zh](https://huggingface.co/Langboat/bloom-6b4-zh)  
     本文所用模型，可替换成LLama
+    
 - Deepspeed  
     zero_3、cpuoffload、fp16
+  
 - GPUs  
     8*48G A6000
+  
 - Para  
     token=1024,batchsize=32✖8  
     token=2048,batchsize=8✖8
+  
 - Requriements  
     pytorch=1.13.1  deepspeed=0.7.5  tansformers=4.21.0  
     transformers=4.28.1带有大模型的生成效果【流式输出】，最近进行了升级，同时deepspeed升级为0.8.3，torch没变
+  
 - Projects  
     0.Pretrain: deepspeed --master_addr 0.0.0.0 --master_port 6006 --include localhost:0,1,2,3,4,5,6,7 ./Model_Bloom_Pretrain.py  
     1.FineTune: deepspeed --master_addr 0.0.0.0 --master_port 6006 --include localhost:0,1,2,3,4,5,6,7 ./Model_Bloom_Sft.py  
     2.convert_deepspeedmodel_fp32: python model_convert32_save.py  
     3.inference: python test.py  
-    4.api: python Bloom_api.py  
+    4.api: python Bloom_api.py
+  
 - gradient_checkpointing  
     use_cache=False;  batch_size 可以增大10倍以上  
     token =1024,batchsize=32 * 8  
