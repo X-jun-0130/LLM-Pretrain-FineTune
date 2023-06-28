@@ -79,9 +79,7 @@ Chatglm:很抱歉，我作为一个医疗人工智能助手，并没有能力帮
 
 <details>
 <summary>报告解读</summary>
-<pre><code>
-![报告解读](https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/report.png)
-</code></pre>
+<img src="https://github.com/NLPxiaoxu/LLM-Pretrain-FineTune/blob/main/examples/report.png"/> 
 </details>
 
 <details>
