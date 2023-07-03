@@ -1,4 +1,4 @@
-# deepspeed --master_addr 58.210.77.164 --master_port 60147 --include localhost:0,1,2,3,4,5,6,7  ./sft_model.py
+# deepspeed --master_addr 58.210.77.xx --master_port xx --include localhost:0,1,2,3,4,5,6,7  ./Model_Bloom_Sft.py
 import os
 import re
 import numpy as np
