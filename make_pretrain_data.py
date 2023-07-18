@@ -1,47 +1,34 @@
 import json
 import random
 import os
-os.chdir('./Nlp_2023/Medical_data/')
-'''
-书籍：51本，
-药品说明书：9700
-疾病说明书：7200
-百科: 50000
+from transformers import LlamaTokenizer
 
 
-实体识别：18000
-事件抽取：15000
+tokenizer_llama = LlamaTokenizer.from_pretrained('/Model_TH/openllama-7b/')
 
-报告诊断：20000
-问诊对话：60000  
-报告生成：8000 
 
-单轮问答：kuake 36000 + llama 7000 + 书籍 2000     [100000]
-多轮医疗问答： 50000 
-多项选择:50000 
-
-'''
-from transformers import AutoTokenizer,BloomTokenizerFast
-
-model_name = "./Model_TH/Bloom_6B4_zh/"
-tokenizer = BloomTokenizerFast.from_pretrained(model_name)
-
-def joint(txt_list, join_length):
+def joint(txt_list):
+    
     new_txtlist = []
     point = []
     n = 0
     while len(point) < len(txt_list) and n < len(txt_list):
         if n not in point:
-            joint_str = str(txt_list[n])
+            joint_str = txt_list[n][0]
+            length_joint = txt_list[n][1]
             point.append(n)
-
             for j in range(n+1, len(txt_list)):
                 if j not in point:
-                    if len(joint_str + '\t' + str(txt_list[j])) > join_length:
-                        pass
-                    else:
-                        joint_str +=  '\t' + str(txt_list[j])
+                    if (length_joint + txt_list[j][1]) >= 2000 and (length_joint + txt_list[j][1]) <= 2048:
                         point.append(j)
+                        joint_str +=  txt_list[j][0]
+                        break
+                    elif (length_joint + txt_list[j][1]) < 2000:
+                        joint_str +=  txt_list[j][0]
+                        length_joint += txt_list[j][1]
+                        point.append(j)
+                    else:
+                        pass
             new_txtlist.append(joint_str)
         else:
             pass
@@ -49,276 +36,186 @@ def joint(txt_list, join_length):
         n += 1
     return new_txtlist
 
+# def joint(txt_list):
+#     new_txtlist = []
+#     while len(txt_list) >= 2:
+#         point = []
+#         joint_str = ''
+#         joint_str = txt_list[0][0]
+#         length_joint = txt_list[0][1]
+#         point.append(0)
+#         for j in range(1, len(txt_list)):
+#             if (length_joint + txt_list[j][1]) >= 2000 and (length_joint + txt_list[j][1]) <= 2048:
+#                 point.append(j)
+#                 joint_str +=  txt_list[j][0]
+#                 break
+#             elif (length_joint + txt_list[j][1]) < 2000:
+#                 joint_str +=  txt_list[j][0]
+#                 length_joint += txt_list[j][1]
+#                 point.append(j)
+#             else:
+#                 pass
 
-def chunk_1024(file_list, length):
-    data_list = []
-    n = 0
-    _list = []
-    for file in file_list:
-        _list += file[0][:file[1]]
-    random.shuffle(_list)
-    n += len(_list)
-    print(n)
-    data_list.extend([k for k in _list if len(k) >= length])
+#         new_txtlist.append(joint_str)
+#         new_txt_list = [txt_list[z] for z in range(len(txt_list)) if z not in point]
+        
+#         if len(new_txt_list) == 1:
+#             new_txtlist.append(new_txt_list[0][0])
+#         elif len(new_txt_list) > 1:
+#             txt_list = new_txt_list
+#             continue
+#         else:
+#             break
+#     return new_txtlist
+
+
+from concurrent.futures import ProcessPoolExecutor
+def mp_process(function,txt_list):
+    select_all = []
+    with ProcessPoolExecutor(max_workers=32) as Pool:
+        results = Pool.map(function, txt_list)
+        for result in results:
+            select_all.extend(result)
+    return select_all
+
+
+def get_chunk(_list, length):
+    data_list, list_chunk = [], []
+    for k_line in _list:
+        if k_line[1] > length:
+            data_list.append(k_line)
+        else:
+            list_chunk.append(k_line)
+
+    print('切分错误:', str(len(data_list)))
+    cut_list = []
+    for ml in data_list:
+        cut_list.extend(sliding_window_template_with_examples(ml, int(0.5*len(ml)), int(0.5*len(ml))-75))
+
     '''
-    时间太长了，将列表分100批进行组合
+    时间太长了，将列表分1000批进行组合
     '''
-    list_1080 = [k for k in _list if len(k) < length]
-    list_length = len(list_1080)
-    slice = 300
+    list_chunk += cut_list
+    random.shuffle(list_chunk)
+    list_length = len(list_chunk)
+    slice = 10
     m = int(list_length/slice)+1
+    list_all = []
+    result_all = []
     for i in range(slice):
-        slice_list = list_1080[i*m:(i+1)*m]
-        joint_1080 = joint(slice_list, length)
-        data_list.extend(joint_1080)
+        print('拼接:',str(i))
+        slice_list = list_chunk[i*m:(i+1)*m]
+        # list_all.append(slice_list)
+        joint_chunk = joint(slice_list)
+        result_all.extend(joint_chunk)
     
-    return data_list, n
-
-
-def chunk_2048(file_list, length):
-    data_list = []
-    n = 0
-    _list = []
-    for file in file_list:
-        _list += file[0][:file[1]]
-    random.shuffle(_list)
-    n += len(_list)
-    print(n)
-    data_list.extend([k for k in _list if len(k) >= length])
-    '''
-    时间太长了，将列表分100批进行组合
-    '''
-    list_2100 = [k for k in _list if len(k) < length]
-    list_length = len(list_2100)
-    slice = 300
-    m = int(list_length/slice)+1
-    for i in range(slice):
-        slice_list = list_2100[i*m:(i+1)*m]
-        joint_2100 = joint(slice_list, length)
-        data_list.extend(joint_2100)
+    # result_all = mp_process(joint, list_all)
     
-    return data_list, n
-
+    return result_all
 
 
 def sliding_window_template_with_examples(text, length, step):
     left = 0
     right = length
     _list = []
-    while right < len(text) +step:
+    while right < len(text) + step:
         line = text[left:right]
         _list.append(line)
         left += step
         right += step
     return _list
 
-'''
-doc
-'''
-doc_list = json.load(open('./new_data/doc_data/bookdoc.json', 'r', encoding='utf-8')) + json.load(open('./new_data/doc_data/drug_disease_json.json', 'r', encoding='utf-8')) 
 
-zd_1 =  [str(k).strip().replace('\n', '')[1:-1] for k in  json.load(open('./new_data/doc_data/zd_1.json', 'r', encoding='utf-8'))]
-zd_2 = [str(k).strip().replace('\n', '')[1:-1] for k in  json.load(open('./new_data/doc_data/zd_2.json', 'r', encoding='utf-8'))]
+def cut_sentence(datalist):
+    data_cut = []
+    for k in datalist:
+        token_leng = len(tokenizer_llama.encode(k))
+        if token_leng <= 2047:
+            data_cut.append([k+'</s>', token_leng+1])
+        else:
+            x = int(round(token_leng/2047)) + 1  #向上取整
+            length = int(len(k) / x)
+            line_list = sliding_window_template_with_examples(k, length, length-75)
+            for line in line_list:
+                len_line = len(tokenizer_llama.encode(line))
+                if len_line <= 2047:
+                    data_cut.append([line+'</s>', len_line+1])
+                else:
+                    llen = int(len(line)/2)
+                    _line_list = sliding_window_template_with_examples(line, llen, llen-75)
+                    for ll in _line_list:
+                        data_cut.append([ll+'</s>', len(tokenizer_llama.encode(ll))+1]) 
+    return data_cut
 
+def get_pretrain_text(data_list):
+    x = 32
+    y = int(len(data_list)/x)+1
+    x_all = []
+    for i in range(x):
+        slice_list = data_list[i*y:(i+1)*y]
+        x_all.append(slice_list)
 
-# doc_medical,_ = chunk_2048([[zd_1,100000],
-#                            [zd_2, 100000]], 2250)                         
+    cut_list = mp_process(cut_sentence, x_all)
+    print('切分完成！')
+    print('切分后列表:', str(len(cut_list)))
+    data_cut = list(set(map(lambda i: tuple(i), cut_list)))
 
-# doc_2048 = []
-# for k in (doc_list + doc_medical):
-#     if len(k) <= 2250:
-#         doc_2048.append(k)
-#     else:
-#         line_list = sliding_window_template_with_examples(k, 2250, 2100)
-#         doc_2048.extend(line_list)
+    print('去重后列表长度:', str(len(data_cut)))
+    
+    min_list, max_list = [], []
 
-# print(doc_2048[-1])
-# print(len(doc_2048))
-# print(len(''.join(doc_2048)))
-
-# pre_data = ['<s>'+k+'</s>' for k in  doc_2048]
-# cut_dataset = []
-# max_tok = []
-# for line in pre_data:
-#     k = tokenizer.encode(line)
-#     if len(k) <= 2048:
-#         max_tok.append(len(k))
-#         cut_dataset.append(line)
-
-# print(len(cut_dataset))
-# print(max(max_tok))
-# print(len(''.join(cut_dataset)))
-
-# en_train_data = open('./pretrain_data/doc_2048.json', 'wb')
-# eachline = json.dumps(cut_dataset, ensure_ascii=False, indent=2) + '\n'
-# eachline = eachline.encode()
-# en_train_data.write(eachline)
-
-# 206930945  230714
-# 194465211  111016
-
-
-
-'''
-dia
-'''
-dia_hdf = [''.join(k) for k in  json.load(open('./new_data/dia_data/dia_hdf.json', 'r', encoding='utf-8'))]
-dia_report = [''.join([str(j) for j in k]) for k in  json.load(open('./new_data/dia_data/dia_report.json', 'r', encoding='utf-8'))]
-
-dia_tc = [''.join(k) for k in  json.load(open('./new_data/dia_data/dia_tc.json', 'r', encoding='utf-8'))]
-
-dia_imcs = [''.join([str(j) for j in k]) for k in  json.load(open('./new_data/dia_data/imcs_report.json', 'r', encoding='utf-8'))]
-print(dia_imcs[-1])
-dia_medical = []
-med_dia =  [''.join(k) for k in  json.load(open('./new_data/dia_data/medical_dia.json', 'r', encoding='utf-8'))]
-for x in med_dia:
-    x = x.replace('User:', '患者:')
-    x = x.replace('System:', '医生:')
-    dia_medical.append(x)
-
-print(dia_medical[1000])
-belle_med =  json.load(open('./new_data/dia_data/belle_med_dia.json', 'r', encoding='utf-8'))
-belle_other = json.load(open('./new_data/dia_data/belle_other_dia.json', 'r', encoding='utf-8'))
-random.shuffle(belle_other)
-belle_multi = []
-for key in (belle_med + belle_other[:60000]):
-    kkk = ''.join((key['instruction']+key['output']))
-    kkk = kkk.replace('\nHuman:', '||Human:')
-    kkk = kkk.replace('\nAssistant:', '||AIer:')
-    belle_multi.append(''.join(kkk.split('||')))
+    for key in data_cut:
+        if key[1] <= 2048 and key[1] >= 2000:
+            min_list.append(key[0])
+        else:
+            max_list.append(key)
+    # min_list = [k[0] for k in data_cut if  k[1] <= 2048 and k[1] >= 2000]
+    # max_list = [h for h in data_cut if h[0] not in min_list]
+    print('过滤后:', str(len(max_list)))
+    data_chunk = get_chunk(max_list, 2048)
+    data_chunk += min_list
+    return data_chunk
 
 
-print(belle_multi[-1])
-'''
-ie
-'''
-ner = ['实体识别:'+k['text']+str(k['answer']) for k in  json.load(open('./new_data/ie_data/ner_data.json', 'r', encoding='utf-8'))]
-event = ['事件提取:'+k['text']+str(k['event']) for k in  json.load(open('./old_data/ie_data/CHIP-CDEE_train.json', 'r', encoding='utf-8'))]
+def get_file(data, file_name):
+    pre_data =[line.replace('  ', '').replace('\u2002','').replace('\u3000','').replace('\t','')  for line in  data]
+
+    print(len(pre_data), len(''.join(pre_data)))
+    data_chunk = get_pretrain_text(pre_data)
+
+    print(len(data_chunk), len(''.join(data_chunk)))
+    cut_dataset = []
+    max_tok = []
+
+    for line in data_chunk:
+        k = tokenizer_llama.encode(line)
+        max_tok.append(len(k))
+        if len(k) <= 2048:
+            cut_dataset.append(line)
+            json_str = json.dumps({'text':line}, ensure_ascii=False)
+            with open('./pretrain_data_llama/'+file_name, 'a+', encoding='utf-8') as file_w:
+                file_w.write(json_str + '\n')
+
+    print(len(cut_dataset), len(''.join(cut_dataset)))
+    print(max(max_tok))
 
 '''
-multi_choice
+books
 '''
-op_all = []
-opqa = json.load(open('./new_data/multi_qa/multi_med_qa.json', 'r', encoding='utf-8'))
-for op in opqa:
-    ques = op['question']
-    options = op['options']
-    answer = op['answer']
-    h = '\n'.join([k+ '.'+ options[k] for k in options])
-    op_all.append(ques+'\n'+h+'\n'+ '答案:' +answer)
+b_text = []
+b_path = './new_data/books/'
+for bt in os.listdir(b_path):
+    print(bt)
+    b_text += json.load(open(b_path+bt, 'r', encoding='utf-8'))
 
-med_choice = json.load(open('./new_data/multi_qa/medical_choice.json', 'r', encoding='utf-8'))
-for mc in med_choice:
-    cat = mc['category']
-    ques = mc['question']
-    options = mc['options']
-    answer = mc['answer']
-    mh = '\n'.join([k for k in options])
-    ana = mc['analysis']
-    if len(ana) > 0:
-        op_all.append(cat+'\n'+ques+'\n'+mh+'\n'+ '答案:' +answer + '\n'+ana)
-    else:
-        op_all.append(cat+'\n'+ques+'\n'+mh+'\n'+ '答案:' +answer)
-
-print(op_all[-1])
-'''
-qa
-'''
-
-cot_med_qa = [k['instruction']+k['input']+k['output'] for k in  json.load(open('./new_data/qa_data/cot_med_qa.json', 'r', encoding='utf-8'))]
-
-cot_other_qa = [k['instruction']+k['input']+ k['output'] for k in  json.load(open('./new_data/qa_data/cot_other_qa.json', 'r', encoding='utf-8'))]
-random.shuffle(cot_other_qa)
-print(cot_med_qa[-1])
-kuake_qa = [k['text']+ k['answer'] for k in  json.load(open('./new_data/qa_data/kuake_qa.json', 'r', encoding='utf-8'))]
-llama_qa = [k['text']+k['answer'] for k in  json.load(open('./new_data/qa_data/llama_qa.json', 'r', encoding='utf-8'))]
-print(kuake_qa[-1])
-lora_qa = [k['instruction']+k['input']+k['output'] for k in  json.load(open('./new_data/qa_data/trans_chinese_alpaca_data.json', 'r', encoding='utf-8'))]
-print(lora_qa[-2])
-
-# dia_chunk, _ = chunk_2048([[dia_hdf, 100000],
-#                            [dia_report, 100000],
-#                            [dia_tc, 100000],
-#                            [dia_imcs, 100000],
-#                            [dia_medical, 100000],
-#                            [belle_multi, 100000],
-#                            [ner,100000],
-#                            [event, 100000],
-#                            [op_all,100000],
-#                            [cot_med_qa,100000],
-#                            [cot_other_qa,60000],
-#                            [kuake_qa,100000],
-#                            [llama_qa,100000],
-#                            [lora_qa, 100000]], 2800)
-
-
-# chunking_2048 = []
-# for k in dia_chunk:
-#     if len(k) <= 2800:
-#         chunking_1024.append(k)
-#     else:
-#         line_list = sliding_window_template_with_examples(k, 2800, 2650)
-#         chunking_2048.extend(line_list)
-
-# pre_data = ['<s>'+k+'</s>' for k in  chunking_2048]
-# print(len(pre_data))
-
-# cut_dataset = []
-# max_tok = []
-# for line in pre_data:
-#     k = tokenizer.encode(line)
-#     if len(k) <= 2048:
-#         max_tok.append(len(k))
-#         cut_dataset.append(line)
-
-# print(len(cut_dataset))
-# print(max(max_tok))
-# print(len(''.join(cut_dataset)))
-
-# en_train_data = open('./pretrain_data/diaqa_data_2048.json', 'wb')
-# eachline = json.dumps(cut_dataset, ensure_ascii=False, indent=2) + '\n'
-# eachline = eachline.encode()
-# en_train_data.write(eachline)
-
-#159257740  124178
-#148820969  53292
-
+print(len(b_text))
+get_file(b_text, 'books.json')
 
 '''
-kg
+llama或者bloom都可以使用，替换tokenizer即可
+按照token长度进行拼接
+
+首先进行文本token长度进行长度切分，按照2048的倍数+1进行切分，切分后文本和长度存入列表，此步骤使用32进程进行操作；
+进行去重；
+进行拼接【发现32进行速度竟然很慢，估计什么bug没发现】
 '''
-# kg_data =  ''.join([k.strip('\n')  for k in open('./new_data/kg/surgery.txt', 'r', encoding='utf-8')] )+ ''.join([k.strip('\n') for k in open('./new_data/kg/subject_disease.txt', 'r', encoding='utf-8')])
-# kg_data =kg_data.split('全文下载')
-
-# kg_cmekg = [k['text']+k['answer'] for k in json.load(open('./new_data/kg/cmekg_dis_train_data.json', 'r', encoding='utf-8'))] + [k['text']+k['answer'] for k in json.load(open('./new_data/kg/cmekg_lab_train_data.json', 'r', encoding='utf-8'))]  + [k['text']+k['answer'] for k in json.load(open('./new_data/kg/cmekg_sym_train_data.json', 'r', encoding='utf-8'))]
-
-# kg_chunk,_ = chunk_2048([[kg_data,100000],
-#                          [kg_cmekg, 100000]], 2600)
-
-# kg_list = []
-# for line in kg_chunk:
-#     if len(line) < 2600:
-#         kg_list.append(line)
-#     else:
-#         kg_list.extend(sliding_window_template_with_examples(line, 2600, 2450))
-
-# print(len(kg_list))
-# kg_dataset = []
-# long_chunk = ['<s>'+k+'</s>' for k in kg_list]
-# max_tok = []
-# for line in long_chunk:
-#     k = tokenizer.encode(line)
-#     if len(k) <= 2048:
-#         max_tok.append(len(k))
-#         kg_dataset.append(line)
-
-# print(len(kg_dataset))
-# print(max(max_tok))
-# print(len(''.join(kg_dataset)))
-# #8307660
-# en_train_data = open('./pretrain_data/pretrain_kg_2048.json', 'wb')
-# eachline = json.dumps(kg_dataset, ensure_ascii=False, indent=2) + '\n'
-# eachline = eachline.encode()
-# en_train_data.write(eachline)
-#6408
-#3033
