@@ -1,5 +1,5 @@
 {
-  "train_batch_size": 128,
+  "train_batch_size":32,
   "optimizer": {
     "type": "AdamW",
     "params": {
