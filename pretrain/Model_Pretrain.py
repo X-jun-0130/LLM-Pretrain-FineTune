@@ -14,7 +14,6 @@ model_name = '/workspace/Model_TH/Tiger-llama2-13B/'
 torch.manual_seed(42)
 
 model_max_length = 4096
-flash_attn = True
 
 # Initialize a  tokenizer
 tokenizer = LlamaTokenizer.from_pretrained(model_name)
