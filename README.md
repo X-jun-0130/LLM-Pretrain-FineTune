@@ -1,3 +1,6 @@
+### [20230926更新]
+[我司开源7B增量预训练和微调模型-WiNGPT](https://github.com/winninghealth)
+
 <details>
 <summary>Model_Project</summary>
     
