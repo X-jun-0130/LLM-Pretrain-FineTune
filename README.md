@@ -1,4 +1,4 @@
-### [20230926更新]
+### [20230926更新---东家模型开源]
 [卫宁健康7B增量预训练和微调模型开源-WiNGPT](https://github.com/winninghealth/WiNGPT2)
 
 <details>
