@@ -1,6 +1,5 @@
-# deepspeed --master_addr 172.16.0.93 --master_port 5050 --include localhost:0,1,2,3,4,5,6,7 ./Model_Sft.py
+# deepspeed --master_addr 172.x.93 --master_port 5050 --include localhost:0,1,2,3,4,5,6,7 ./Model_QwenSft.py
 import os
-os.chdir('/workspace/Xuxiangjun/Model_Train/')
 import torch
 from datasets import load_dataset
 from torch.utils.data import random_split
@@ -9,7 +8,7 @@ from transformers.optimization import get_cosine_schedule_with_warmup
 import warnings
 warnings.filterwarnings("ignore")
 
-model_name = '/workspace/Xuxiangjun/Pretrain_Model/Qwen-7B/epoch3/'
+model_name = '/Pretrain_Model/Qwen-7B/epoch3/'
 torch.manual_seed(1234)
 
 # flash_attn = True
@@ -43,7 +42,7 @@ def tokenize(text):
 '''
 data_process
 '''
-instruction_dataset = load_dataset("json", data_files='/data/private/WAIR/dataset/已整理数据/wndata_sft/all_instruction_Qwen-7B20230918.json', split="train")
+instruction_dataset = load_dataset("json", data_files='/all_instruction_Qwen-7B20230918.json', split="train")
 tokenized_dataset = instruction_dataset.map(tokenize, remove_columns=instruction_dataset.column_names, num_proc=32, keep_in_memory=False)
 
 train_size = int(0.98 * len(tokenized_dataset))
