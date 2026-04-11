@@ -1,7 +1,6 @@
-# deepspeed --master_addr 172.xxx.94 --master_port 5050 --include localhost:0,1,2,3,4,5,6,7  /Model_Sft.py
+# deepspeed --include localhost:0,1,2,3,4,5,6,7  /Model_Sft.py
 
 import os
-os.chdir('/workspace/Xuxiangjun/LLM-Train/LLM_SFT')
 import torch
 from datasets import load_dataset,concatenate_datasets
 from liger_kernel.transformers import AutoLigerKernelForCausalLM as AutoModelForCausalLM
