@@ -709,8 +709,8 @@ def convert_zero_checkpoint_to_vl_model(checkpoint_dir, output_dir, original_vl_
 
 
 # ========== 使用示例 ==========
-checkpoint_dir = '/workspace/Xuxiangjun/LLM-Train/LLM_SFT/Train_Result/wingpt-27B/checkpoint-796'
-output_dir = '/workspace/Xuxiangjun/Model-HF/Model-SFT/WiNGPT-27B-SFT-0407/'
+checkpoint_dir = '/LLM-Train/LLM_SFT/Train_Result/wingpt-27B/checkpoint-796'
+output_dir = '/Model-HF/Model-SFT/WiNGPT-27B-SFT-0407/'
 original_vl_model_dir = '/data1/Model-TH/Qwen3.5-27B/'
 
 convert_zero_checkpoint_to_vl_model(checkpoint_dir, output_dir, original_vl_model_dir, dtype='bf16')
