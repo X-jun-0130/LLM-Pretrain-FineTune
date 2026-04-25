@@ -40,7 +40,7 @@ LLM-Pretrain-FineTune/
 #### 3.1 **Data_Synthesis（数据合成）**
 - **`synth_data.py`**: 异步数据合成工作流，核心流程：
   1. 读取原始问题数据
-  2. 为每个问题调用 `deepseek32` 模型生成 **N个候选答案**（默认4个）
+  2. 为每个问题调用 大模型生成 **N个候选答案**（默认4个）
   3. 使用 GenRM 选择模式从候选中挑出最优答案
   4. 通过质量评估（满分100分，阈值0.9筛选）
   5. 输出带 reasoning_content 和 score 的结构化数据
@@ -104,6 +104,6 @@ LLM-Pretrain-FineTune/
 
 ```
 原始医疗数据 → [数据合成] → 候选答案生成 → [GenRM过滤] → 质量筛选
-    → [分层抽样] → 最终SFT数据 → [Model_MIX训练] → [模型转换] → WiNGPT模型
+    → [分层抽样] → 最终SFT数据 → [Model_MIX训练] → [模型转换] → SFT模型
 ```
 
