@@ -72,7 +72,7 @@ LLM-Pretrain-FineTune/
 |------|------|
 | **预训练模式** | 直接tokenize文本，input_ids=labels（全序列训练） |
 | **非think模式** | 仅对 `assistant\n` 之后的回复部分计算loss（输入部分mask为-100） |
-| **独立think模式** | 仅匹配 `assistant\n<think>\n` 并训练从该标记到 `<|im_end|>` 的内容 |
+| **独立think模式** | 仅匹配 `assistant\n<think>\n` 并训练从该标记到 `结束符` 的内容 |
 | **混合think模式** | 支持空think块和带think块的混合数据，处理单轮/多轮对话 |
 
 关键特性：
