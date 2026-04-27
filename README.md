@@ -21,12 +21,11 @@ LLM-Pretrain-FineTune/
 ├── Data_Synthesis/              # 医疗数据合成（答案生成 + GenRM优选）
 │   ├── prompts.py               #   合成提示模板（GenRM选择模式 + 质量评估）
 │   └── synth_data.py            #   异步数据合成工作流（含断点续传）
-├── Instruction_Rewrite/         # 指令多样化改写（提升模型泛化性）
+├── Instruction_Rewriter/         # 指令多样化改写（提升模型泛化性）
 │   ├── api_config.py            #   LLM API 配置
 │   ├── prompts.py               #   改写与校验提示词模板
 │   ├── instruction_rewriter.py  #   核心改写引擎（三级强度 + 语义校验）
-│   ├── run_rewrite.py           #   命令行入口
-│   └── merge_data.py            #   原始数据与改写数据合并工具
+│   └── run_rewrite.py           #   命令行入口
 ├── Sft_Data_Filter/             # SFT 数据质量过滤
 │   ├── data_filter.py           #   基于 Judge 模型的质量验证
 │   ├── Verifier_Prompts.py      #   验证器提示模板（有/无参考答案）
@@ -137,13 +136,6 @@ python Instruction_Rewrite/run_rewrite.py \
 python Instruction_Rewrite/run_rewrite.py \
     --input /path/to/prompts/v2.0.0.json \
     --test
-
-# 4. 合并原始数据与改写数据为最终训练集
-python Instruction_Rewrite/merge_data.py \
-    --original_dir /path/to/Minimalism-SFT/Medical \
-    --rewritten_dir /path/to/output \
-    --output /path/to/merged.jsonl \
-    --clean
 ```
 
 **`run_rewrite.py`** 参数说明：
@@ -275,9 +267,6 @@ python Instruction_Rewrite/merge_data.py \
                                  ▼
                           最终 SFT 数据集
                                  │
-                        [merge_data.py]
-                        原始 + 改写混合
-                                 │
                                  ▼
                         [Model_MIX.py]
                     混合思维多模式训练
@@ -312,21 +301,14 @@ python Sft_Data_Filter/data_filter.py --input answers.jsonl --output filtered.js
 # Step 4: 后处理筛选 —— 分层抽样
 python Sft_Data_Filter/SFT_PostFilter.py --input filtered.jsonl --output final.jsonl
 
-# Step 5: 合并数据 —— 原始数据 + 改写数据混合
-python Instruction_Rewrite/merge_data.py \
-    --original_dir ./original/ \
-    --rewritten_dir ./rewritten/ \
-    --output ./train_data.jsonl \
-    --clean
-
-# Step 6: 模型训练
+# Step 5: 模型训练
 deepspeed --num_gpus 8 Model_MIX.py \
     --model_name_or_path Qwen/Qwen2.5-7B \
     --train_data_path ./train_data.jsonl \
     --output_dir ./checkpoints \
     --deepspeed ds_config.json
 
-# Step 7: 模型转换
+# Step 6: 模型转换
 python model_convert16save.py \
     --checkpoint_path ./checkpoints/global_step_xxx \
     --output_path ./final_model \
