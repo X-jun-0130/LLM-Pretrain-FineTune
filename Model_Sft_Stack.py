@@ -1,4 +1,4 @@
-# deepspeed --include localhost:0,1,2,3,4,5,6,7 /workspace/Xuxiangjun/LLM-Train/LLM_SFT/Model_Sft_Stack.py
+# deepspeed --include localhost:0,1,2,3,4,5,6,7 /LLM-Train/LLM_SFT/Model_Sft_Stack.py
 import os
 import re
 import torch
