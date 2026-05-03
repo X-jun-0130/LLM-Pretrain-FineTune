@@ -30,6 +30,15 @@ LLM-Pretrain-FineTune/
 │   ├── data_filter.py           #   基于 Judge 模型的质量验证
 │   ├── Verifier_Prompts.py      #   验证器提示模板（有/无参考答案）
 │   └── SFT_PostFilter.py        #   分层后处理筛选（按 correct_count 采样）
+├── LayerCake/                    # 🆕 零训练层操作工具集
+│   ├── layer_probing.py         #   Dense 模型层知识探测（Logit Lens + Knockout）
+│   ├── verify_model.py          #   堆叠/剪枝后模型质量验证
+│   ├── LayerStack/              #   层堆叠（模型扩展）
+│   │   ├── layer_stacking.py        #   Dense 模型层堆叠
+│   │   └── layer_stacking_moe.py    #   MoE 模型层堆叠
+│   └── LayerCut/                #   层剪枝（模型压缩）
+│       ├── layer_importance_moe.py  #   MoE 模型块冗余度分析
+│       └── layer_pruning_moe.py     #   MoE 模型层剪枝
 ├── examples/                    # 示例截图
 │   ├── report.png               #   报告解读示例
 │   ├── dialogue.png             #   多轮对话示例
@@ -328,5 +337,147 @@ python model_convert16save.py \
 | **训练灵活性** | 增量预训练 / 非Think / 独立Think / 混合Think 四种模式自由切换 |
 | **模型输出** | SafeTensors 格式 + 多精度支持 + VL 模型兼容 |
 | **容错能力** | 全链路断点续传 + 自动重试 + 降级兜底 |
+
+---
+
+## LayerCake（零训练层操作工具集）🆕
+
+> **核心理念**：通过直接操作 Transformer 层的物理结构（复制/删除中间层块），在**无需额外训练**的前提下实现模型参数量的扩展或压缩。利用残差连接的数学特性，通过控制输出投影权重实现 identity（直通）初始化，使堆叠后的模型行为与原始模型完全一致。
+
+#### 架构基础
+
+Qwen3.5/Qwen3.6 系列模型的 Transformer 层以 **4 层为一个块**（Block），每块内部结构固定为：
+
+```
+Block N = [linear_attention] [linear_attention] [linear_attention] [full_attention]
+              第1层               第2层               第3层            第4层
+```
+
+所有层操作均以**完整块（4 层）为最小单位**，不可拆分单层。
+
+Dense 模型和 MoE 模型的结构差异：
+
+| 特性 | Dense（Qwen3.5-9B） | MoE（Qwen3.6-35B-A3B） |
+|------|---------------------|------------------------|
+| 层数/块数 | 32 层 / 8 个块 | 40 层 / 10 个块 |
+| MLP 结构 | 标准 Dense MLP | 256 路由专家 + 共享专家，top-8 激活 |
+| 输出投影键名 | `mlp.down_proj.weight` | `mlp.experts.down_proj` + `mlp.shared_expert.down_proj.weight` |
+
+#### 三种初始化模式
+
+LayerCake 提供三种复制层初始化模式，核心区别在于如何处理复制层的**输出投影权重**：
+
+```
+                        identity          scaled(0.1)          copy
+                     ──────────────    ──────────────    ──────────────
+  复制层行为          纯残差直通         弱变换(10%)         完全变换(100%)
+  输出投影权重        全部归零           ×0.1               不变
+  其他权重           保留原值           保留原值            保留原值
+  零训练可用性        ✅ 完全可用        ⚠️ 基本可用         ❌ 乱码
+  输出质量           ≈ 原始模型         轻微下降            不可用
+  新层学习潜力        需从零学           有少量"种子"        已有完整变换
+  后续训练难度        中等              较低                需大量训练
+  推荐指数           ⭐⭐⭐⭐⭐         ⭐⭐⭐              ⭐
+```
+
+Transformer 层的残差结构决定了 identity 模式的可行性：
+
+```
+  output = input + Attention(input) + MLP(mid)
+                         ↑                ↑
+                    out_proj/o_proj    down_proj   ← 控制这三个权重即可控制层行为
+```
+
+当三个输出投影全部归零时，该层变为纯直通：`output = input + 0 + 0 = input`，等同于不存在。
+
+---
+
+#### 1. 层堆叠（模型扩展）
+
+
+通过复制中间层块实现参数量扩展，支持 Dense 和 MoE 两种架构。
+
+**`LayerStack/layer_stacking.py`** — Dense 模型层堆叠（Qwen3.5-9B → 12B/14B/16B）
+
+| 配置 | 复制块 | 总层数 | 估算参数量 |
+|------|--------|--------|-----------|
+| 原始 | 无 | 32 | ~9B |
+| ~12B | 2,3,4,5 | 48 | ~12.2B |
+| ~14B | 1,2,3,4,5,6 | 56 | ~14.6B |
+| ~16B | 0,1,2,3,4,5,6,7 | 64 | ~17B |
+
+**块选择建议：**
+```
+  Block 0  Block 1  Block 2  Block 3  Block 4  Block 5  Block 6  Block 7
+  [L0-3]   [L4-7]   [L8-11]  [L12-15] [L16-19] [L20-23] [L24-27] [L28-31]
+  ──────   ──────   ──────   ──────   ──────   ──────   ──────   ──────
+  ⚠️ 边界   ⚠️ 边界   ✅ 推荐   ✅ 推荐   ✅ 推荐   ✅ 推荐   ⚠️ 边界   ⚠️ 边界
+```
+
+```bash
+# 预览堆叠计划
+python LayerCake/LayerStack/layer_stacking.py \
+    --src_dir /data1/Model-TH/Qwen3.5-9B \
+    --dup_groups 2,3,4,5 \
+    --dry_run
+
+# 执行堆叠（推荐 identity 模式）
+python LayerCake/LayerStack/layer_stacking.py \
+    --src_dir /data1/Model-TH/Qwen3.5-9B \
+    --dst_dir /path/to/output/Qwen3.5-12B \
+    --dup_groups 2,3,4,5 \
+    --init_mode identity
+
+# scaled 模式
+python LayerCake/LayerStack/layer_stacking.py \
+    --src_dir /data1/Model-TH/Qwen3.5-9B \
+    --dst_dir /path/to/output/Qwen3.5-12B \
+    --dup_groups 2,3,4,5 \
+    --init_mode scaled \
+    --scale_factor 0.1
+```
+
+**`LayerStack/layer_stacking_moe.py`** — MoE 模型层堆叠（Qwen3.6-35B-A3B → 49B/70B）
+
+与 Dense 版本的关键区别：
+- MLP 使用 MoE 结构：`experts.down_proj`（packed tensor）+ `shared_expert.down_proj`
+- identity 模式同时归零路由专家和共享专家的输出投影
+- 支持精确的总参数/激活参数估算
+
+```bash
+# MoE 堆叠
+python LayerCake/LayerStack/layer_stacking_moe.py \
+    --src_dir /data1/Model-TH/Qwen3.6-35B-A3B \
+    --dst_dir /path/to/output/Qwen3.6-49B-A4B \
+    --dup_groups 3,4,5,6 \
+    --init_mode identity
+```
+
+---
+
+#### 2. 层剪枝（模型压缩）
+
+与层堆叠对偶：直接丢弃冗余中间块实现压缩。
+
+**`LayerCut/layer_pruning_moe.py`** — MoE 模型层剪枝
+
+```bash
+# 预览减层计划
+python LayerCake/LayerCut/layer_pruning_moe.py \
+    --src_dir /data1/Model-TH/Qwen3.6-35B-A3B \
+    --drop_blocks 5,6 \
+    --dry_run
+
+# 执行减层 (40层→32层)
+python LayerCake/LayerCut/layer_pruning_moe.py \
+    --src_dir /data1/Model-TH/Qwen3.6-35B-A3B \
+    --dst_dir /path/to/output/Qwen3.6-28B-A3B-pruned \
+    --drop_blocks 5,6
+```
+
+安全约束：
+- 自动保护边界块（前 2 和后 2 个块），防止残差流分布突变
+- 如需删除边界块需加 `--allow_boundary`（风险自负）
+- 自动检测相邻块删除并发出 CPT 恢复量警告
 
 ---
