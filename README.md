@@ -1,6 +1,6 @@
 # 📊 LLM-Pretrain-FineTune
 
-> **Deepspeed · LLM · Medical_Dialogue · 医疗大模型 · 增量预训练 · 微调 · 指令多样化**
+> **Deepspeed · LLM · Medical_Dialogue · 医疗大模型 · 增量预训练 · 微调 · 指令多样化 · 模型层拆分堆叠**
 
 ## 1. 项目概述
 
