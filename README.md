@@ -31,8 +31,7 @@ LLM-Pretrain-FineTune/
 │   ├── Verifier_Prompts.py      #   验证器提示模板（有/无参考答案）
 │   └── SFT_PostFilter.py        #   分层后处理筛选（按 correct_count 采样）
 ├── LayerCake/                    # 🆕 零训练层操作工具集
-│   ├── layer_probing.py         #   Dense 模型层知识探测（Logit Lens + Knockout）
-│   ├── verify_model.py          #   堆叠/剪枝后模型质量验证
+│   ├── layer_probing.py         #   模型层知识探测（Logit Lens + Knockout）
 │   ├── LayerStack/              #   层堆叠（模型扩展）
 │   │   ├── layer_stacking.py        #   Dense 模型层堆叠
 │   │   └── layer_stacking_moe.py    #   MoE 模型层堆叠
